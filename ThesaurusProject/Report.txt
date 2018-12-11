@@ -1,0 +1,30 @@
+I used a hash table with chaining to store words that will be recognized by the program. It is essentially a way for the program to access the
+  memory corresponding to that word.
+  In the hash table there exits (besides some data) a linked list for chaining, and a pointer to a Heap.
+I used a heap to store synonyms with a closeness score. (Natural score is a holdover from a failed idea)
+
+It is in this way the program reads from a library file, passes each line into a hash table.
+These words then have a data member of a max heap that stores synonyms.
+The heap exists so that when prompted, it can return the top 3 synonyms with the highest closeness values.
+
+I had several challenges, such as deciding what data structures to use.
+  I originally wanted to use a graph so that each added synonym would act as a word in itself, and just add it as a node with edges to synonyms.
+  This would make a "web" of words so that every word in the graph is connected to the other ones.
+  I decided not to when I realized it would be less awkward to have direct control over words added, that way there is an avoidance of
+  one word returning a completely unrelated synonym. I would have tried to mitigate this using weighting in the graph, but since I wanted
+  user input to redefine the connections between each synonym, this might have fallen apart.
+  Still, it should be possible to add every word and its synonyms into the hash table as words themselves defined with synonyms.
+
+I had the biggest problem trying to find an error that was preventing my heaps from reorganizing themselves, it turns out it was a poorly
+  created swap function as well as pointing to element 0 in the heap rather than element 1 as the head was the problem.
+  I found this by myself, and it would have been hard for anyone else to find without a good understanding of my code.
+
+Features to add:
+  Now that I am done, it dawns on me that, though I have indeed added a bunch of synonyms to the data structures, it is impossible to access
+  any but the top3 synonyms. I think this could be fixed by having 2 random other synonyms showing up for user input when the get advice function
+  is run. This would still do the function's original job while allowing for more data to be actually used.
+
+  I should be possible to add every words' synonyms as words themselves with synonyms of the same but with word being the synonym in place of word
+  in the synonyms vector.
+
+I worked alone, I did all the work.

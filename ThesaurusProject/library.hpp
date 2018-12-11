@@ -120,10 +120,24 @@ struct hashNode
   void addSyn(string wor, int closeness, int natural); // add to heap
   // to adjust heap for this node in hash
   void repairUpward(int nodeIndex);
+  void increClose(int nodeIndex);
 private:
   // void repairDownward(int nodeIndex); // I actually don't think we need this. Not deleting any nodes
   void swap(heapNode* swapper, heapNode* swappee); // NOTE: swap takes pointers, but synonyms is not a vector of pointers
 };
+void hashNode::increClose(int nodeIndex)
+{
+  if (nodeIndex < 1)
+  {
+    cout << "Error, invalid increment. User inpt. not stored." << endl;
+    return;
+  }
+  else
+  {
+    synonyms[nodeIndex].closeness++;
+    return;
+  }
+}
 void hashNode::addSyn(string wor, int clo, int nat)
 {
   if (synonyms.size() == 0)
@@ -143,14 +157,28 @@ void hashNode::addSyn(string wor, int clo, int nat)
   temp->closeness = clo;
   temp->natural = nat;
   synonyms.push_back(*temp); // dereference temp, because it is not a vector of pointers
-  repairUpward(synonyms.size()); // fix the heap
+  // while (index != 1 && heapArr[parent(index)] > heapArr[index])
+  // {
+  //    swap(&heapArr[index], &heapArr[parent(index)]);
+  //
+  //    index = parent(index);
+  // }
+  repairUpward(synonyms.size() - 1); // fix the heap
   return;
 }
 void hashNode::swap(heapNode* swapper, heapNode* swappee)
 {
-  heapNode* temp = swappee;
-  swappee = swapper;
-  swapper = temp;
+  heapNode* temp = new heapNode;
+  temp->word = swappee->word;
+  temp->closeness = swappee->closeness;
+  temp->natural = swappee->natural;
+  swappee->word = swapper->word;
+  swappee->closeness = swapper->closeness;
+  swappee->natural = swapper->natural;
+  swapper->word = temp->word;
+  swapper->closeness = temp->closeness;
+  swapper->natural = temp->natural;
+  delete temp;
   return;
 }
 void hashNode::repairUpward(int nodeIndex)
@@ -163,6 +191,16 @@ void hashNode::repairUpward(int nodeIndex)
 
   if (nodeIndex == 1) // i.e. at start of heap
   {
+    // cout << "At start of heap." << endl;
+    // if (synonyms.size() < 5)
+    // {
+    //   return;
+    // }
+    // for (int i = 1; i <= 3; i++)
+    // {
+    //   cout << synonyms[i].word << endl;
+    //   cout << synonyms[i].closeness << endl;
+    // }
     return;
   }
   /**
@@ -186,19 +224,68 @@ void hashNode::repairUpward(int nodeIndex)
     }
   }
   **/
+  if (nodeIndex > synonyms.size())
+  {
+    cout << "Error, no value to swap." << endl;
+    return;
+  }
   heapNode* temp1 = &synonyms[nodeIndex]; // child
   if (nodeIndex % 2 != 0)
   {
     nodeIndex = (nodeIndex - 1) / 2; // set nodeIndex to be parent nodeIndex
   }
+  else
+  {
+    nodeIndex = nodeIndex / 2;
+  }
   heapNode* temp2 = &synonyms[nodeIndex]; // parent
+  // cout << temp2->word << temp1->word << endl;
   if (temp1->closeness > temp2->closeness) // max heap
   {
     swap(temp1, temp2);
+    // if (synonyms.size() >= 4)
+    // {
+    //   cout << synonyms[1].word;
+    //   cout << synonyms[2].word;
+    //   cout << synonyms[3].word << endl;
+    //   cout << synonyms[1].closeness << endl;
+    //   cout << synonyms[2].closeness << endl;
+    //   cout << synonyms[3].closeness << endl;
+    // }
     repairUpward(nodeIndex); // since nodeIndex is now set as the node we (possibly) swapped to, should run again at correct location
   }
+  // if (synonyms.size() >= 4)
+  // {
+  //   cout << synonyms[1].word;
+  //   cout << synonyms[2].word;
+  //   cout << synonyms[3].word << endl;
+  //   cout << synonyms[1].closeness << endl;
+  //   cout << synonyms[2].closeness << endl;
+  //   cout << synonyms[3].closeness << endl;
+  // }
   return;
 }
+
+// void hashNode::repairUpward(int nodeIndex)
+// {
+//   int l = leftChild(i);
+//   int r = rightChild(i);
+//
+//   // Finds the smallest of node, left Child, and right child
+//  // The parent is swapped with the smallest of all 3
+//   int smallest = i;
+//   if (l <= currentSize && heapArr[l] < heapArr[i])
+//       smallest = l;
+//   if (r <= currentSize && heapArr[r] < heapArr[smallest])
+//       smallest = r;
+//
+//   // Similarly do this till the leaf
+//   if (smallest != i)
+//   {
+//       swap(&heapArr[i], &heapArr[smallest]);
+//       repairUpward(smallest);
+//   }
+// }
 
 class hashLib
 {

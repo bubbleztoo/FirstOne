@@ -61,12 +61,17 @@ void directThesaur(stringstream* sentence, hashLib* pass)
     {
       cout << words.substr(1) << " ";
     }
-    cout << words << " "; // adds new part of sentence every loop
+    else
+    {
+      cout << words << " "; // adds new part of sentence every loop
+    }
   }
+  cout << endl;
+  cout << endl;
   return;
 }
 
-void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3])
+void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3], heapNode* tip3[3])
 {
   if (sentence->str() == "")
   {
@@ -85,16 +90,19 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3])
       for (int i = 0; i < 3; i++)
       {
         top3[i] = temp->synonyms[i + 1];
+        tip3[i] = &(temp->synonyms[i + 1]);
       }
       if (top3[2].closeness < temp->synonyms[4].closeness || top3[2].closeness < temp->synonyms[5].closeness)
       {
         if (temp->synonyms[4].closeness >= temp->synonyms[5].closeness)
         {
           top3[2] = temp->synonyms[4];
+          tip3[2] = &(temp->synonyms[4]);
         }
         else
         {
           top3[2] = temp->synonyms[5];
+          tip3[2] = &(temp->synonyms[5]);
         }
       }
       if (top3[1].closeness < temp->synonyms[6].closeness || top3[1].closeness < temp->synonyms[7].closeness) // left and right (check child of both sides compared to other child)
@@ -102,14 +110,17 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3])
         if (temp->synonyms[6].closeness >= temp->synonyms[7].closeness)
         {
           top3[1] = temp->synonyms[6];
+          tip3[1] = &(temp->synonyms[6]);
         }
         else
         {
           top3[1] = temp->synonyms[7];
+          tip3[1] = &(temp->synonyms[7]);
         }
       }
       cout << temp->word << ":" << endl;
       cout << top3[0].word << " " << top3[1].word << " " << top3[2].word << endl;
+
       if (head->word == "")
       {
         head->word = temp->word;
@@ -164,6 +175,7 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3])
       {
         string user2;
         hashNode* tempp = pass->getHashNode(check->word);
+        // cout << tempp << endl;
         cout << "Which synonym (1, 2, 3) was best for:" << endl;
         cout << check->word << endl;
         cout << "(1)" << check->top3[0].word << "     (2)" << check->top3[1].word << "      (3)" << check->top3[2].word << endl;
@@ -172,10 +184,11 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3])
         {
           for (int i = 1; i < tempp->synonyms.size(); i++)
           {
-            cout << temp->synonyms[i].word << endl;
+            // cout << temp->synonyms[i].word << endl;
             if (tempp->synonyms[i].word == check->top3[0].word)
             {
               tempp->synonyms[i].closeness++;
+              // tip3[0]->closeness++;
               tempp->repairUpward(i);
               break;
             }
@@ -188,6 +201,7 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3])
             if (tempp->synonyms[i].word == check->top3[1].word)
             {
               tempp->synonyms[i].closeness++;
+              // tip3[1]->closeness++;
               tempp->repairUpward(i);
               break;
             }
@@ -200,11 +214,14 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3])
             if (tempp->synonyms[i].word == check->top3[2].word)
             {
               tempp->synonyms[i].closeness++;
+              // tip3[2]->closeness++;
+              // cout << tempp->synonyms[i].closeness << endl;
               tempp->repairUpward(i);
               break;
             }
           }
         }
+        cout << "Thank you." << endl;
         cout << endl;
         // else skip
         check = check->next;
@@ -301,6 +318,7 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
     cout << "Would you like to (I)mprove a sentence, (G)et advise on one, or do you want to (Q)uit?" << endl;
     cin >> ia;
     cin.ignore();
+    cout << endl;
     string temp;
     stringstream sentence;
     if (ia == 'I' || ia == 'i')
@@ -318,7 +336,8 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
       getline(cin, temp);
       sentence << temp;
       heapNode top3[3];
-      indireThesaur(&sentence, &test, top3);
+      heapNode* tip3[3]; // backup, not really needed
+      indireThesaur(&sentence, &test, top3, tip3);
       // cout << endl;
       //????
     }
