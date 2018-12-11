@@ -120,6 +120,7 @@ struct hashNode
   void addSyn(string wor, int closeness, int natural); // add to heap
   // to adjust heap for this node in hash
   void repairUpward(int nodeIndex);
+  void repairDownward(int nodeIndex);
   void increClose(int nodeIndex);
 private:
   // void repairDownward(int nodeIndex); // I actually don't think we need this. Not deleting any nodes
@@ -175,6 +176,63 @@ void hashNode::swap(heapNode* swapper, heapNode* swappee)
   delete temp;
   return;
 }
+void hashNode::repairDownward(int nodeIndex)
+{
+  if (nodeIndex >= synonyms.size())
+  {
+    return; // nothing to change
+  }
+  // heapNode* temp1 = &synonyms[nodeIndex];
+  // nodeIndex = nodeIndex * 2;
+  // heapNode* temp2 = &synonyms[nodeIndex];
+  // nodeIndex++;
+  // heapNode* temp3 = &synonyms[nodeIndex];
+  // if (temp1->closeness > temp2->closeness) // max heap
+  // {
+  //   swap(temp1, temp2);
+  //   repairUpward(nodeIndex); // since nodeIndex is now set as the node we (possibly) swapped to, should run again at correct location
+  // }
+  // return;
+  int l = nodeIndex*2;
+  int r = nodeIndex*2 + 1;
+  if (l >= synonyms.size())
+  {
+    return; // already at bottom
+  }
+  if (r >= synonyms.size())
+  { // we KNOW that l < synonyms.size()
+    if (synonyms[nodeIndex].closeness < synonyms[l].closeness)
+    {
+      swap(&synonyms[nodeIndex], &synonyms[l]);
+    }
+    return;
+  }
+  // Finds the smallest of node, left Child, and right child
+  // The parent is swapped with the smallest of all 3
+  int largest = nodeIndex;
+  if (synonyms[l].closeness > synonyms[nodeIndex].closeness)
+  {
+    largest = l;
+    if (synonyms[r].closeness > synonyms[l].closeness)
+    {
+      largest = r;
+    }
+  }
+  else if (synonyms[r].closeness > synonyms[nodeIndex].closeness)
+      largest = r;
+
+  if (largest == nodeIndex)
+  {
+    return;
+  }
+  else
+  {
+    swap(&synonyms[nodeIndex], &synonyms[largest]);
+    nodeIndex = largest;
+    repairDownward(largest);
+  }
+}
+
 void hashNode::repairUpward(int nodeIndex)
 {
   if (nodeIndex < 1) // just to make sure I didn't screw anything up

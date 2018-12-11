@@ -379,7 +379,7 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
   while(true)
   {
     char ia;
-    cout << "Would you like to (I)mprove a sentence, (G)et advise on one, or do you want to (Q)uit?" << endl;
+    cout << "Would you like to (I)mprove a sentence, (G)et advise on one, access the (L)ibrary, or do you want to (Q)uit?" << endl;
     cin >> ia;
     cin.ignore();
     cout << endl;
@@ -406,6 +406,112 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
       indireThesaur(&sentence, &test, top3, tip3);
       // cout << endl;
       //????
+    }
+    else if (ia == 'L' || ia == 'l')
+    {
+      cout << "Would you like to see (R)ecognized words, or (S)ynonyms for a specific word?" << endl;
+      string ipt;
+      while(true)
+      {
+        cin >> ipt;
+        cout << endl;
+        if (ipt == "R" || ipt == "r")
+        {
+          test.printHashTable();
+          cout << endl;
+          cout << "NOTE: EVERY WORD SHOWN HERE IS RECOGNIZED, THE ARROWS AND NUMBERS DON'T MEAN MUCH, THIS IS SIMPLY A VISUALIZATION OF THE DATA." << endl;
+          cout << endl;
+          break;
+        }
+        else if (ipt == "S" || ipt == "s")
+        {
+          cout << "What word would you like to see synonyms for?" << endl;
+          cin >> ipt;
+          cout << endl;
+          if (ipt == "")
+          {
+            break;
+          }
+          for (int i = 0; i < ipt.length(); i++)
+          {
+            if (ipt[i] <= 90 || ipt[i] >= 65)
+            {
+              ipt[i] + 32; // to lower
+            }
+          }
+          hashNode* pmet = test.getHashNode(ipt);
+          if (pmet == NULL)
+          {
+            break;
+          }
+          for (int j = 1; j < pmet->synonyms.size() - 1; j++)
+          {
+            cout << pmet->synonyms[j].word << ", " << flush;
+          }
+          cout << pmet->synonyms[pmet->synonyms.size() - 1].word << flush;
+          cout << endl;
+          cout << endl;
+          cout << "Would you like to give feedback on a synonym?" << endl;
+          while (true)
+          {
+            cin >> ipt;
+            cout << endl;
+            if (ipt == "Y" || ipt == "y" || ipt == "yes" || ipt == "YES" || ipt == "Yes" || ipt == "yEs" || ipt == "yeS" || ipt == "YeS" || ipt == "yES" || ipt == "YEs")
+            {
+              cout << "What synonym would you like to give feedback to?" << endl;
+              cin >> ipt;
+              cout << endl;
+              bool a = false;
+              for (int k = 0; k < pmet->synonyms.size(); k++)
+              {
+                if (pmet->synonyms[k].word == ipt)
+                {
+                  a = true;
+                  cout << "Is this a good or bad synonym?" << endl;
+                  while (true)
+                  {
+                    cin >> ipt;
+                    for (int h = 0; h < ipt.length(); h++)
+                    {
+                      if (ipt[h] <= 90 || ipt[h] >= 65)
+                      {
+                        ipt[h] + 32; // to lower
+                      }
+                    }
+                    if (ipt == "good" || ipt == "g" || ipt == "goo" || ipt == "go")
+                    {
+                      pmet->synonyms[k].closeness++;
+                      pmet->repairUpward(k);
+                      break;
+                    }
+                    else if (ipt == "b" || ipt == "ba" || ipt == "bad")
+                    {
+                      if (pmet->synonyms[k].closeness == 0)
+                      {
+                        break;
+                      }
+                      pmet->synonyms[k].closeness--;
+                      pmet->repairDownward(k);
+                      break;
+                    }
+                  }
+                }
+              }
+              if (a == false)
+              {
+                cout << "Could not find synonym" << endl;
+              }
+              cout << endl;
+              cout << "Would you like to give feedback on another synonym?" << endl;
+            }
+            else if (ipt == "N" || ipt == "n" || ipt == "no" || ipt == "NO" || ipt == "No" || ipt == "nO")
+            {
+              break;
+            }
+          }
+          break;
+        }
+      }
     }
     else if (ia == 'Q' || ia == 'q')
     {

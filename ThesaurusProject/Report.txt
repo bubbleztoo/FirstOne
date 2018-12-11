@@ -22,10 +22,10 @@ I had the biggest problem trying to find an error that was preventing my heaps f
 Features to add:
   Now that I am done, it dawns on me that, though I have indeed added a bunch of synonyms to the data structures, it is impossible to access
   any but the top3 synonyms. I think this could be fixed by having 2 random other synonyms showing up for user input when the get advice function
-  is run. This would still do the function's original job while allowing for more data to be actually used.
+  is run. This would still do the function's original job while allowing for more data to be actually used. Done, sort of.
 
   I should be possible to add every words' synonyms as words themselves with synonyms of the same but with word being the synonym in place of word
-  in the synonyms vector.
+  in the synonyms vector. Done
 
   Write to file.
 
