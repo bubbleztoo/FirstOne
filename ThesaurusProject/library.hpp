@@ -336,14 +336,14 @@ hashLib::~hashLib()
 }
 void hashLib::addWord(string wor)
 {
-  for (int l = 0; l < wor.length(); l++)
-  {
-    wor[l] = tolower(wor[l]);
-  }
   if (getHashNode(wor) != NULL)
   {
     // cout << "Word already in library" << endl;
     return;
+  }
+  for (int l = 0; l < wor.length(); l++)
+  {
+    wor[l] = tolower(wor[l]);
   }
   int loc = hash(wor);
   if (list[loc].word != "") // if node exists at this location in hashtable
@@ -371,47 +371,30 @@ void hashLib::addWord(string wor)
 hashNode* hashLib::getHashNode(string wor)
 {
   string wo;
-
-  // while(true)
-  // {
-  //   if (wor[wor.length()] == '.' || wor[wor.length()] == ',') // if comma or period exits/punctuation exists
-  //   {
-  //     wor.pop_back(); // yeah?
-  //   }
-  //   else if (wor[0] == ' ')
-  //   {
-  //     // wor.erase(wor[0]);
-  //     string temp = wor.substr(1);
-  //     wor = temp;
-  //   }
-  //   else if (wor[wor.length()] == ' ')
-  //   {
-  //     // wor.erase(wor[wor.length()]);
-  //     wor.pop_back();
-  //   }
-  //   else if (wor[0] == '.' || wor[0] == ',')
-  //   {
-  //     string temp = wor.substr(1);
-  //     wor = temp;
-  //     // wor.erase(wor[0]);
-  //   }
-  //   else
-  //   {
-  //     break;
-  //   }
-  // }
+  string wah;
   if (wor[wor.length() - 1] == '.' || wor[wor.length() - 1] == ',' || wor[wor.length() - 1] == '?' || wor[wor.length() - 1] == '!')
   {
-    wo = wor.substr(0, wor.length() - 1);
+    wah = wor.substr(0, wor.length() - 1);
+    // cout << wo << endl;
   }
   else
   {
-    wo = wor;
+    wah = wor;
+  }
+  if (wah[0] == ' ')
+  {
+    wo = wah.substr(1, wah.length());
+  }
+  else
+  {
+    wo = wah;
   }
   for (int l = 0; l < wo.length(); l++)
   {
     wo[l] = tolower(wo[l]);
   }
+  // cout << wo << endl;
+  // here too
   int loc = hash(wo);
   hashNode* temp = NULL;
   if (list[loc].word == wo)
@@ -436,14 +419,25 @@ hashNode* hashLib::getHashNode(string wor)
 }
 int hashLib::hash(string wor)
 {
-  for (int l = 0; l < wor.length(); l++)
+  string wo;
+  if (wor[0] == ' ')
   {
-    wor[l] = tolower(wor[l]);
+    wo = wor.substr(1, wor.length());
   }
-  int ret = 3784;
-  for (int i = 0; i < wor.length(); i++)
+  else
   {
-    ret = ret + wor[i];
+    wo = wor;
+  }
+  for (int l = 0; l < wo.length(); l++)
+  {
+    wo[l] = tolower(wo[l]);
+  }
+  // Ok, it breaks here...
+  // cout << wo << endl;
+  int ret = 3784;
+  for (int i = 0; i < wo.length(); i++)
+  {
+    ret = ret + wo[i];
   }
   // if (ret < 0)
   // {

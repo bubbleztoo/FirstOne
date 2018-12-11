@@ -24,11 +24,15 @@ void directThesaur(stringstream* sentence, hashLib* pass)
   }
   string words;
   hashNode* temp = NULL;
+  bool gotValue = false;
+  bool badValue = false;
   while (*sentence >> words)
   {
     temp = pass->getHashNode(words); // will still work even with storing weirdness
     if (temp != NULL)
     {
+      gotValue = true;
+      badValue = false;
       if (words[0] == ' ' || words[0] == '.' || words[0] == ',')
       {
         string temp1;
@@ -57,7 +61,20 @@ void directThesaur(stringstream* sentence, hashLib* pass)
         words = temp->synonyms[1].word;
       }
     }
-    if (words[0] == ' ')
+    else
+    {
+      if (gotValue == false)
+      {
+        badValue = true;
+      }
+    }
+    if (badValue)
+    {
+      cout << "No recognized word." << endl;
+      cout << endl;
+      return;
+    }
+    else if (words[0] == ' ')
     {
       cout << words.substr(1) << " ";
     }
@@ -82,11 +99,15 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3], heap
   hashNode* temp = NULL;
   LLstorage* head = new LLstorage;
   LLstorage* temp1 = new LLstorage;
+  bool gotValue = false;
+  bool badValue = false;
   while (*sentence >> words)
   {
     temp = pass->getHashNode(words);
     if (temp != NULL)
     {
+      badValue = false; // reset this in case it got flipped
+      gotValue = true; // set this so that we know it won't break
       for (int i = 0; i < 3; i++)
       {
         top3[i] = temp->synonyms[i + 1];
@@ -153,6 +174,19 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3], heap
         temp1 = temp1->next;
       }
     }
+    else
+    {
+      if (gotValue == false)
+      {
+        badValue = true;
+      }
+    }
+  }
+  if (badValue == true) // that is, there has been no output and the program will break
+  {
+    cout << "No recognized word" << endl;
+    cout << endl;
+    return;
   }
   string user;
   cout << endl;
@@ -239,15 +273,6 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3], heap
 int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
 {
   hashLib test(stoi(argv[1]));
-  // test.addWord("Testing");
-  // test.addWord("Testing");
-  // test.addWord("Failing");
-  // test.addWord("Running");
-  // test.addWord("Dancing");
-  // test.addWord("Reading");
-  // test.addWord("Meading");
-  // test.addWord("Deading");
-  //test.printHashTable();
 
   ifstream in;
   in.open(argv[2]);
@@ -258,12 +283,13 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
     return 0;
   }
   string worSyn; // word and synonyms
-  while (getline(in, worSyn))
+  while (getline(in, worSyn, '\n'))
   {
     if (worSyn.empty() || worSyn == "https://justenglish.me/2014/04/18/synonyms-for-the-96-most-commonly-used-words-in-english/")
     {
       break;
     }
+    //cout << worSyn << endl;
     // split word and synonyms
     string wor;
     stringstream syns;
@@ -277,30 +303,43 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
       }
     }
     test.addWord(wor); // add the wor to Hash
+    string spacesyn;
     string onesyn;
+    hashNode* hold = test.getHashNode(wor);
     while (getline(syns, onesyn, ','))
     {
-      // string::iterator a = remove(onesyn.begin(), onesyn.end(), ' ');
-      // onesyn.erase(a, onesyn.end());
-      cout << onesyn << endl;
-      test.addWord(onesyn); // want to add these to Hash table as well to increase scope
-      test.getHashNode(wor)->addSyn(onesyn, 1, 0); // start with all closeness values at 1, natural is TODO
-    } // pass in synonyms to word, then pass synonyms to the synonyms' hashes
-    for (int i = 1; i < test.getHashNode(wor)->synonyms.size(); i++) // adding all synonyms for every value in this vector
-    {
-      string syncopy = test.getHashNode(wor)->synonyms[i].word;
-      for(int j = 1; j < test.getHashNode(wor)->synonyms.size(); j++) // go through again, skipping i
+      if (onesyn[0] == ' ')
       {
-        if (j == i)
+        if (onesyn.empty() == true)
         {
-          test.getHashNode(syncopy)->addSyn(wor, 1, 0); // pass in wor at this location as a synonym instead of itself as one
+          break;
         }
-        else
-        {
-          test.getHashNode(syncopy)->addSyn(test.getHashNode(wor)->synonyms[j].word, 1, 0); // pass other values to it
-        }
+        spacesyn = onesyn.substr(1);
       }
-    }
+      else
+      {
+        spacesyn = onesyn;
+      }
+      // cout << spacesyn << endl;
+      test.addWord(spacesyn); // want to add these to Hash table as well to increase scope
+      hold->addSyn(spacesyn, 1, 0); // start with all closeness values at 1, natural is TODO
+    } // pass in synonyms to word, then pass synonyms to the synonyms' hashes
+    // for (int i = 1; i < hold->synonyms.size(); i++) // adding all synonyms for every value in this vector
+    // {
+    //   string syncopy = hold->synonyms[i].word;
+    //   cout << hold->synonyms.size() << endl;
+    //   for(int j = 1; j < hold->synonyms.size(); j++) // go through again, skipping i
+    //   {
+    //     if (j == i)
+    //     {
+    //       test.getHashNode(syncopy)->addSyn(wor, 1, 0); // pass in wor at this location as a synonym instead of itself as one
+    //     }
+    //     else
+    //     {
+    //       test.getHashNode(syncopy)->addSyn(hold->synonyms[j].word, 1, 0); // pass other values to it
+    //     }
+    //   }
+    // }
   }
   in.close();
   // test.printHashTable();
