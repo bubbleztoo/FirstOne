@@ -27,4 +27,6 @@ Features to add:
   I should be possible to add every words' synonyms as words themselves with synonyms of the same but with word being the synonym in place of word
   in the synonyms vector.
 
+  Write to file.
+
 I worked alone, I did all the work.

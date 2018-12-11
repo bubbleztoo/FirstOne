@@ -142,9 +142,10 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3], heap
       cout << temp->word << ":" << endl;
       cout << top3[0].word << " " << top3[1].word << " " << top3[2].word << endl;
 
+      // Ok, this is all so that I can increment based on user input
       if (head->word == "")
       {
-        head->word = temp->word;
+        head->word = temp->word; // set start of LL as element in hashtable
         for (int b = 0; b < 3; b++)
         {
           head->top3[b] = top3[b];
@@ -305,6 +306,7 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
     test.addWord(wor); // add the wor to Hash
     string spacesyn;
     string onesyn;
+    vector<string> sys;
     hashNode* hold = test.getHashNode(wor);
     while (getline(syns, onesyn, ','))
     {
@@ -323,11 +325,34 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
       // cout << spacesyn << endl;
       test.addWord(spacesyn); // want to add these to Hash table as well to increase scope
       hold->addSyn(spacesyn, 1, 0); // start with all closeness values at 1, natural is TODO
+      sys.push_back(spacesyn);
     } // pass in synonyms to word, then pass synonyms to the synonyms' hashes
+    for (int i = 0; i < sys.size(); i++)
+    {
+      for (int j = 0; j < sys.size(); j++)
+      {
+        test.getHashNode(sys[i])->addSyn(sys[j], 1 , 0);
+        if (sys[i] == sys[j])
+        {
+          test.getHashNode(sys[i])->synonyms[j].word = wor; // pass wor to it instead instead of itself as a synonym of itself
+        }
+      }
+    }
+    // for (int i = 1; i < hold->synonyms.size(); i++)
+    // {
+    //   test.addWord(hold->synonyms[i]); // maybe make it so add these as they are read?
+    //   for (int j = 1; j < hold->synonyms.size(); j++)
+    //   {
+    //     if (j == i)
+    //   }
+    // }
+    //
     // for (int i = 1; i < hold->synonyms.size(); i++) // adding all synonyms for every value in this vector
     // {
-    //   string syncopy = hold->synonyms[i].word;
-    //   cout << hold->synonyms.size() << endl;
+    //   test.addWord(hold->synonyms[i]);
+    //   test.getHashNode(*hold->synonyms[i].word)->synonyms = ;
+    //   // string syncopy = hold->synonyms[i].word;
+    //   // cout << hold->synonyms.size() << endl;
     //   for(int j = 1; j < hold->synonyms.size(); j++) // go through again, skipping i
     //   {
     //     if (j == i)
@@ -338,7 +363,7 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
     //     {
     //       test.getHashNode(syncopy)->addSyn(hold->synonyms[j].word, 1, 0); // pass other values to it
     //     }
-    //   }
+    //  }
     // }
   }
   in.close();
@@ -365,6 +390,7 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
       cout << "Please enter a sentence to be improved:" << endl;
       getline(cin, temp);
       sentence << temp;
+      cout << endl;
       directThesaur(&sentence, &test);
       // cout << endl;
       //????
@@ -374,6 +400,7 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
       cout << "Please enter a sentence to get advise on:" << endl;
       getline(cin, temp);
       sentence << temp;
+      cout << endl;
       heapNode top3[3];
       heapNode* tip3[3]; // backup, not really needed
       indireThesaur(&sentence, &test, top3, tip3);
