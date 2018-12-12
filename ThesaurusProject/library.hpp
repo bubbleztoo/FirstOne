@@ -153,6 +153,15 @@ void hashNode::addSyn(string wor, int clo, int nat)
   {
     wor[l] = tolower(wor[l]);
   }
+  for (int i = 1; i < synonyms.size(); i++) // increment checking for if word already exists
+  {
+    if (synonyms[i].word == wor)
+    {
+      synonyms[i].closeness++;
+      repairUpward(i); // newly added code
+      return;
+    }
+  }
   heapNode* temp = new heapNode;
   temp->word = wor;
   temp->closeness = clo;
@@ -178,7 +187,7 @@ void hashNode::swap(heapNode* swapper, heapNode* swappee)
 }
 void hashNode::repairDownward(int nodeIndex)
 {
-  if (nodeIndex >= synonyms.size())
+  if (nodeIndex >= synonyms.size() || nodeIndex <= 0)
   {
     return; // nothing to change
   }
@@ -230,6 +239,7 @@ void hashNode::repairDownward(int nodeIndex)
     swap(&synonyms[nodeIndex], &synonyms[largest]);
     nodeIndex = largest;
     repairDownward(largest);
+    return;
   }
 }
 

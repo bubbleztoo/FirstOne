@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
+#include <cctype>
 #include "library.hpp"
 
 using namespace std;
@@ -140,7 +141,7 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3], heap
         }
       }
       cout << temp->word << ":" << endl;
-      cout << top3[0].word << " " << top3[1].word << " " << top3[2].word << endl;
+      cout << top3[0].word << "   " << top3[1].word << "   " << top3[2].word << endl;
 
       // Ok, this is all so that I can increment based on user input
       if (head->word == "")
@@ -197,10 +198,7 @@ void indireThesaur(stringstream* sentence, hashLib* pass, heapNode top3[3], heap
     cin >> user;
     for (int i = 0; i < user.length(); i++) // essentially, to lower without including cctype
     {
-      if (user[i] <= 90 || user[i] >= 65)
-      {
-        user[i] + 32;
-      }
+      user[i] = tolower(user[i]);
     }
     cout << endl;
     if (user == "y" || user == "yes" || user == "sure") // ASCII a = 97, z = 122. A = 65, Z = 90. Difference of 32
@@ -323,48 +321,32 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
         spacesyn = onesyn;
       }
       // cout << spacesyn << endl;
-      test.addWord(spacesyn); // want to add these to Hash table as well to increase scope
+      hashNode* synHasLoc = test.getHashNode(spacesyn);
+      if (synHasLoc == NULL) // only want to add it once
+      {
+        test.addWord(spacesyn); // want to add these to Hash table as well to increase scope
+      }
       hold->addSyn(spacesyn, 1, 0); // start with all closeness values at 1, natural is TODO
       sys.push_back(spacesyn);
     } // pass in synonyms to word, then pass synonyms to the synonyms' hashes
+    for (int g = 0; g < wor.size(); g++)
+    {
+      wor[g] = tolower(wor[g]);
+    }
     for (int i = 0; i < sys.size(); i++)
     {
       for (int j = 0; j < sys.size(); j++)
       {
-        test.getHashNode(sys[i])->addSyn(sys[j], 1 , 0);
         if (sys[i] == sys[j])
         {
-          test.getHashNode(sys[i])->synonyms[j].word = wor; // pass wor to it instead instead of itself as a synonym of itself
+          test.getHashNode(sys[i])->addSyn(wor, 1, 0); // pass wor to it instead instead of itself as a synonym of itself
+        }
+        else
+        {
+          test.getHashNode(sys[i])->addSyn(sys[j], 1, 0);
         }
       }
     }
-    // for (int i = 1; i < hold->synonyms.size(); i++)
-    // {
-    //   test.addWord(hold->synonyms[i]); // maybe make it so add these as they are read?
-    //   for (int j = 1; j < hold->synonyms.size(); j++)
-    //   {
-    //     if (j == i)
-    //   }
-    // }
-    //
-    // for (int i = 1; i < hold->synonyms.size(); i++) // adding all synonyms for every value in this vector
-    // {
-    //   test.addWord(hold->synonyms[i]);
-    //   test.getHashNode(*hold->synonyms[i].word)->synonyms = ;
-    //   // string syncopy = hold->synonyms[i].word;
-    //   // cout << hold->synonyms.size() << endl;
-    //   for(int j = 1; j < hold->synonyms.size(); j++) // go through again, skipping i
-    //   {
-    //     if (j == i)
-    //     {
-    //       test.getHashNode(syncopy)->addSyn(wor, 1, 0); // pass in wor at this location as a synonym instead of itself as one
-    //     }
-    //     else
-    //     {
-    //       test.getHashNode(syncopy)->addSyn(hold->synonyms[j].word, 1, 0); // pass other values to it
-    //     }
-    //  }
-    // }
   }
   in.close();
   // test.printHashTable();
@@ -426,24 +408,40 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
         else if (ipt == "S" || ipt == "s")
         {
           cout << "What word would you like to see synonyms for?" << endl;
-          cin >> ipt;
-          cout << endl;
-          if (ipt == "")
+          string ip;
+          cin.ignore();
+          while (true)
           {
-            break;
+            getline(cin, ip);
+            if (ip != "")
+            {
+              break;
+            }
+            else
+            {
+              ip = "";
+            }
           }
+          if (ip[ip.length() - 1] == ' ')
+          {
+            ipt = ip.substr(0, ip.length() - 1);
+          }
+          else
+          {
+            ipt = ip;
+          }
+          cout << endl;
           for (int i = 0; i < ipt.length(); i++)
           {
-            if (ipt[i] <= 90 || ipt[i] >= 65)
-            {
-              ipt[i] + 32; // to lower
-            }
+            ipt[i] = tolower(ipt[i]); // to lower
           }
           hashNode* pmet = test.getHashNode(ipt);
           if (pmet == NULL)
           {
+            cout << "Could not find word." << endl;
             break;
           }
+          cout << ipt << ":" << endl;
           for (int j = 1; j < pmet->synonyms.size() - 1; j++)
           {
             cout << pmet->synonyms[j].word << ", " << flush;
@@ -451,16 +449,22 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
           cout << pmet->synonyms[pmet->synonyms.size() - 1].word << flush;
           cout << endl;
           cout << endl;
+          cout << "The earlier a synonym appears, the better it is." << endl;
+          cout << endl;
           cout << "Would you like to give feedback on a synonym?" << endl;
           while (true)
           {
             cin >> ipt;
             cout << endl;
-            if (ipt == "Y" || ipt == "y" || ipt == "yes" || ipt == "YES" || ipt == "Yes" || ipt == "yEs" || ipt == "yeS" || ipt == "YeS" || ipt == "yES" || ipt == "YEs")
+            if (ipt == "Y" || ipt == "y" || ipt == "yes" || ipt == "YES" || ipt == "Yes" || ipt == "yEs" || ipt == "yeS" || ipt == "YeS" || ipt == "yES" || ipt == "YEs" || ipt == "ye" || ipt == "Ye" || ipt == "yE")
             {
               cout << "What synonym would you like to give feedback to?" << endl;
               cin >> ipt;
               cout << endl;
+              for (int u = 0; u < ipt.length(); u++)
+              {
+                ipt[u] = tolower(ipt[u]);
+              }
               bool a = false;
               for (int k = 0; k < pmet->synonyms.size(); k++)
               {
@@ -473,10 +477,7 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
                     cin >> ipt;
                     for (int h = 0; h < ipt.length(); h++)
                     {
-                      if (ipt[h] <= 90 || ipt[h] >= 65)
-                      {
-                        ipt[h] + 32; // to lower
-                      }
+                      ipt[h] = tolower(ipt[h]); // to lower
                     }
                     if (ipt == "good" || ipt == "g" || ipt == "goo" || ipt == "go")
                     {
@@ -486,7 +487,7 @@ int main(int argc, char *argv[]) // hashSize, Thesaurus Lib file
                     }
                     else if (ipt == "b" || ipt == "ba" || ipt == "bad")
                     {
-                      if (pmet->synonyms[k].closeness == 0)
+                      if (pmet->synonyms[k].closeness == 0) // if implement file storage, make this 1
                       {
                         break;
                       }
