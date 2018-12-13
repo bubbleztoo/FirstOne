@@ -69,13 +69,13 @@ void directThesaur(stringstream* sentence, hashLib* pass)
         badValue = true;
       }
     }
-    if (badValue)
-    {
-      cout << "No recognized word." << endl;
-      cout << endl;
-      return;
-    }
-    else if (words[0] == ' ')
+    // if (badValue)
+    // {
+    //   cout << "No recognized word." << endl;
+    //   cout << endl;
+    //   return;
+    // }
+    if (words[0] == ' ')
     {
       cout << words.substr(1) << " ";
     }
